@@ -1,0 +1,254 @@
+{% extends 'layouts/master.html' %}
+{% block title %}{% block page_title %}{{ task.title }}{% endblock %}{% endblock %}
+
+{% block content %}
+		<div class="container mx-auto mt-4 bg-white p-4 rounded max-w-full overflow-x-scroll">
+			<h2 class="text-2xl text-gray-800">{{ task.title }}</h2>
+			<p class="text-gray-600">{{ task.description }}</p>
+
+			<table class="text-left text-gray-600">
+				<tr>
+					<th class="font-normal pr-2">Started at</th>
+					<td>: 
+						{% if task.started_at %}
+							<span>{{ task.started_at|date:"Y-m-d H:i" }}</span>
+						{% else %}
+							<button 
+								class="bg-fuchsia-300 text-white px-2 py-1 rounded shadow-md shadow-fuchsia-200 hover:shadow-fuchsia-300"
+								type="button"
+								x-data
+								@click.prevent="
+									fetch('{% url 'api:task' id=task.id %}', {
+										method: 'PATCH',
+										body: JSON.stringify({started_at: new Date().toLocaleString().replace(/\//g, '-').replace(/ /g, 'T')}),
+										headers: {
+											'Content-Type': 'application/json',
+											'X-CSRFToken': '{{ csrf_token }}'
+										}
+									})
+									.then(() => window.location.reload())
+							">
+									<i class="fas fa-play"></i> Start
+							</button>
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<th class="font-normal pr-2">Due Date</th>
+					<td>: {{ task.due_date|date:"Y-m-d H:i" }}</td>
+				</tr>
+				<tr>
+					<th class="font-normal pr-2">Progress</th>
+					<td>: {{ task.progress|floatformat:2 }}%</td>
+				</tr>
+				<tr>
+					<th class="font-normal pr-2">
+						{% if task.progress == 100 %}
+							Finished at
+						{% else %}
+							Estimated Finish
+						{% endif %}
+					</th>
+					<td>: 
+						<span 
+							class="rounded-full px-2 py-1 text-sm"
+							x-data="{
+								estimatedFinish: new Date(
+										new Date().getTime() + {{ task.estimated_seconds_left }} * 1000
+									)
+							}"
+							{% if task.progress == 100 %}
+								x-text="'{{ task.finished_at|date:"Y-m-d H:i" }}'"
+							{% else %}
+								x-text="estimatedFinish.toLocaleString().replace(/\//g, '-')"
+							{% endif %}
+							:class="{
+								'bg-green-100 text-green-700': estimatedFinish.getTime() < {{ task.due_date|date:"U" }} * 1000,
+								'bg-red-100 text-red-700': estimatedFinish.getTime() > {{ task.due_date|date:"U" }} * 1000
+							}"
+						></span>
+					</td>
+				</tr>
+				<tr>
+					<th class="font-normal pr-2">Average Duration</th>
+					<td>: {{ task.average_duration|floatformat:2 }} hours</td>
+				</tr>
+			</table>
+				
+		</div>
+
+		<div class="container mx-auto mt-4">
+			<form 
+				x-data="{ 
+					method     : 'POST', // POST | PUT | DELETE
+					id         : null,
+					title      : '',
+					finishedAt : '',
+
+					submit() {
+						const url = this.id 
+							? '{% url 'api:chunk' task_id=task.id id='__id__' %}'.replace('__id__', this.id)
+							: '{% url 'api:chunks' task_id=task.id %}';
+
+						const data = {
+							title      : this.title.replace(/^・/gm, ''),
+							finishedAt : this.finishedAt,
+						};
+
+						const options = {
+							method: this.method,
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': '{{ csrf_token }}',
+								'credentials': 'include'
+							},
+							body: JSON.stringify(data)
+						};
+
+						fetch(url, options)
+							.then(() => window.location.reload())
+							.catch(err => console.error(err));
+					}
+				}"
+				@submit.prevent="submit()"
+			>
+				<table class="w-full text-left rounded-lg overflow-hidden px-4 py-2 bg-white">
+					<thead>
+						<tr class="text-gray-800 border-b">
+							<th class="px-4 py-2">No</th>
+							<th class="px-4 py-2">Title</th>
+							<th class="px-4 py-2">Finished at</th>
+							<th class="px-4 py-2">Time spent</th>
+							<th class="px-4 py-2">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="text-gray-700">
+						{% for chunk in task.chunks.all %}
+						<tr data-id="{{ chunk.id }}" class="hover:bg-blue-50">
+							<td class="px-4 py-2 text-center">{{ forloop.counter }}</td>
+							<td class="px-4 py-2">
+								<span x-show="id != {{ chunk.id }}">{{ chunk.title }}</span>
+								<input
+									type="text" 
+									x-model="title" 
+									x-show="id == {{ chunk.id }}" 
+									class="px-4 py-2 border rounded"
+									style="display: none;"
+								>
+							</td>
+							<td class="px-4 py-2">
+								{% if chunk.finished_at %}
+									<span x-show="id != {{ chunk.id }}">{{ chunk.finished_at|date:'Y-m-d H:i' }}</span>
+									<input
+										type="datetime-local"
+										x-model="finishedAt"
+										x-show="id == {{ chunk.id }}" 
+										class="px-4 py-2 border rounded"
+										style="display: none;"
+									>
+								{% else %}
+									<button 
+										type="button" 
+										class="px-4 py-2 bg-indigo-300 hover:bg-indigo-400 text-white rounded disabled:opacity-50"
+										x-show="id != {{ chunk.id }}"
+										:disabled="{{ task.started_at|yesno:'false,true' }}"
+										@click="
+											method = 'PUT';
+											id = {{ chunk.id }};
+											title = '{{ chunk.title }}';
+											finishedAt = new Date().toLocaleString().replace(/\//g,'-').replace(/ /g, 'T');
+											submit();
+										"
+									>
+										Finish
+									</button>
+								{% endif %}
+							</td>
+							<td class="px-4 py-2">
+								<span>{{ chunk.duration|default:'-' }}</span>
+							</td>
+							<td class="px-4 py-2">
+								<button
+									type="button"
+									class="px-4 py-2 text-sm font-semibold text-white rounded"
+									:class="id == {{ chunk.id }} ? 'bg-fuchsia-300 hover:bg-fuchsia-400' : 'bg-gray-400 hover:bg-gray-500'"
+									@click.prevent="
+										id != {{ chunk.id }} 
+											? (
+													method      = 'PUT',
+													id          = {{ chunk.id }},
+													title       = '{{ chunk.title }}',
+													finishedAt  = '{{ chunk.finished_at|date:'Y-m-d H:i' }}'
+												)
+											: submit()
+									"
+								>
+									<i class="fas" :class="id == {{ chunk.id }} ? 'fa-check' : 'fa-edit'"></i>
+								</button>
+								
+								<button
+									type="button"
+									class="px-4 py-2 text-sm font-semibold text-white bg-gray-400 rounded hover:bg-gray-500"
+									@click.prevent="() => {
+										if (confirm('Are you sure you want to delete chunk {{ chunk.title|truncatechars:10 }}?')) {
+											method = 'DELETE';
+											id     = {{ chunk.id }};
+											submit();
+										}
+									}"
+								>
+									<i class="fas fa-trash"></i>
+								</button>
+
+							</td>
+						</tr>
+						{% endfor %}
+
+						<tr class="hover:bg-blue-50">
+								<td class="px-4 py-2 text-center">
+									<i class="fas fa-plus"></i>
+								</td>
+								<td class="px-4 py-2" colspan="3">
+									<textarea
+										type="text"
+										placeholder="Title(s): Use line breaks to add multiple chunks"
+										class="p-2 border rounded disabled:opacity-50 w-full"
+										x-model="title"
+										:class="{'text-transparent': method != 'POST'}"
+										:disabled="method != 'POST'"
+										x-data="{ rows: 1 }"
+										:rows="rows"
+										@input="
+											rows = title.split('\n').length
+											if (rows > 1) {
+												title = title.replace(/^[^・]/gm, '・$&')
+											}
+										"
+									></textarea>
+								</td>
+								<td class="px-4 py-2">
+									<button 
+										class="px-4 py-2 text-sm font-semibold text-white rounded"
+										:class="method == 'POST' ? 'bg-fuchsia-300 hover:bg-fuchsia-400' : 'bg-gray-400 hover:bg-gray-500'"
+										@click.prevent="() => {
+											if (method == 'POST') {
+												submit()
+											} else {
+												method     = 'POST';
+												id         = null;
+												title      = '';
+												finishedAt = '';
+											}
+										}"
+									>
+										<i class="fas" :class="method == 'POST' ? 'fa-check' : 'fa-plus'"></i>
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}

@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from environs import Env
+import os
+
+Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o(+qna$%=o+(-_a73arj=eidicfej0=(@5_0=ic%@obr)5x3%t'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['sigitjpn.pythonanywhere.com']
-
+ALLOWED_HOSTS = ['sigitjpn.pythonanywhere.com', 'localhost']
 
 # Application definition
 
@@ -37,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crud',
+    'tasks',
+    'chunks',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +82,12 @@ WSGI_APPLICATION = 'crud.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE'  : 'django.db.backends.' + os.environ.get('DB_ENGINE', 'sqlite3'),
+        'NAME'    : os.environ.get('DB_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER'    : os.environ.get('DB_USER', 'user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
+        'HOST'    : os.environ.get('DB_HOST', 'localhost'),
+        'PORT'    : os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -99,6 +110,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Password hashing
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -124,7 +143,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # default static files settings for PythonAnywhere.
 # see https://help.pythonanywhere.com/pages/DjangoStaticFiles for more info
-MEDIA_ROOT = '/home/sigitjpn/crud/media'
-MEDIA_URL = '/media/'
-STATIC_ROOT = '/home/sigitjpn/crud/static'
-STATIC_URL = '/static/'
+MEDIA_ROOT       = os.path.join(BASE_DIR, 'media')
+MEDIA_URL        = '/media/'
+STATIC_URL       = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
