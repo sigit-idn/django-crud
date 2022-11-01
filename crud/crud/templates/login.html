@@ -7,18 +7,15 @@
 						{% csrf_token %}
 						<div class="mb-4">
 								<label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-								<input type="username" name="username" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Email">
+								<input type="username" name="username" id="username" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" placeholder="Email">
 						</div>
 						<div class="mb-4">
 								<label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-								<input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Password">
+								<input type="password" name="password" id="password" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none" placeholder="Password">
 						</div>
-						<div class="mb-4">
-								<input type="checkbox" name="remember" id="remember" class="mr-2">
-								<label for="remember" class="text-sm">Remember me</label>
-						</div>
-						<div class="mb-4">
-								<button type="submit" class="bg-blue-300 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Login</button>
+						<div class="mb-4 flex items-center">
+								<button type="submit" class="bg-fuchsia-300 hover:bg-fuchsia-400 text-white font-bold py-2 px-4 rounded focus:outline-none">Login</button>
+								<a href="{% url 'register' %}" class="inline-block align-baseline ml-2 font-bold text-sm text-indigo-300 hover:text-indigo-400">Register</a>
 						</div>
 				</form>
 		</div>

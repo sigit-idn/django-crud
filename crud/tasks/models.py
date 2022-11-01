@@ -1,4 +1,4 @@
-from django.db import models
+from django.db                  import models
 from django.contrib.auth.models import User
 
 class Task(models.Model):
@@ -8,24 +8,12 @@ class Task(models.Model):
 	started_at  = models.DateTimeField(blank=True, null=True)
 	user        = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
 
-	def __str__(self):
-		return self.title
-
-	def to_json(self):
-		return {
-			'id'         : self.id,
-			'title'      : self.title,
-			'description': self.description,
-			'due_date'   : self.due_date,
-			'started_at' : self.started_at,
-			'user'       : self.user.id
-		}
-
 	@property
 	def progress(self):
 		total_chunks = self.chunks.count()
 		if total_chunks == 0:
 			return 0
+
 		finished_chunks = self.chunks.filter(finished_at__isnull=False).count()
 		return finished_chunks / total_chunks * 100
 
@@ -56,3 +44,15 @@ class Task(models.Model):
 	def finished_at(self):
 		return self.chunks.order_by('-finished_at').first().finished_at
 
+	def __str__(self):
+		return self.title
+
+	def to_json(self):
+		return {
+			'id'         : self.id,
+			'title'      : self.title,
+			'description': self.description,
+			'due_date'   : self.due_date,
+			'started_at' : self.started_at,
+			'user'       : self.user.id
+		}

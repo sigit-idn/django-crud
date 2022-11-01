@@ -1,7 +1,0 @@
-DB_ENGINE=mysql
-DB_NAME=sigitjpn$task_manager
-DB_USER=sigitjpn
-DB_PASSWORD=sigit1234
-DB_HOST=sigitjpn.mysql.pythonanywhere-services.com
-DB_PORT=3306
-SECRET_KEY=django-insecure-o(+qna$%=o+(-_a73arj=eidicfej0=(@5_0=ic%@obr)5x3%t

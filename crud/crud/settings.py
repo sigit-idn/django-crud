@@ -11,20 +11,22 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from environs import Env
+import environ
 import os
 
-Env.read_env()
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR.parent, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'secret_key')
+SECRET_KEY = env('SECRET_KEY', default='secret123')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,15 +84,14 @@ WSGI_APPLICATION = 'crud.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE'  : 'django.db.backends.' + os.environ.get('DB_ENGINE', 'sqlite3'),
-        'NAME'    : os.environ.get('DB_NAME', os.path.join(BASE_DIR, 'db.sqlite3')),
-        'USER'    : os.environ.get('DB_USER', 'user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
-        'HOST'    : os.environ.get('DB_HOST', 'localhost'),
-        'PORT'    : os.environ.get('DB_PORT', '5432'),
+        'ENGINE'  : 'django.db.backends.' + env('DB_ENGINE', default='sqlite3'),
+        'NAME'    : env('DB_NAME', default=os.path.join(BASE_DIR, 'db.sqlite3')),
+        'USER'    : env('DB_USER', default=''),
+        'PASSWORD': env('DB_PASSWORD', default=''),
+        'HOST'    : env('DB_HOST', default=''),
+        'PORT'    : env('DB_PORT', default=''),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

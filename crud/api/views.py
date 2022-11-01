@@ -60,7 +60,6 @@ class ChunksView(generic.View):
 
 	def post(self, request, *args, **kwargs):
 		request_body = json.loads(request.body)
-		print('request_body', request_body)
 
 		titles = request_body['title'].splitlines()
 
@@ -84,7 +83,6 @@ class ChunkView(generic.View):
 		request_body = json.loads(request.body)
 		chunk.title   = request_body['title']
 		if request_body['finishedAt']:
-			print('finishedAt', request_body['finishedAt'])
 			chunk.finished_at = request_body['finishedAt']
 
 		chunk.save()
