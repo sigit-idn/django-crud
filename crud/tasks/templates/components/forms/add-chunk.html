@@ -1,0 +1,41 @@
+<tr class="hover:bg-blue-50">
+	<td class="px-4 py-2 text-center">
+		<i class="fas fa-plus"></i>
+	</td>
+	<td class="px-4 py-2" colspan="3">
+		<textarea
+			type="text"
+			placeholder="Title(s): Use line breaks to add multiple chunks"
+			class="p-2 border rounded disabled:opacity-50 w-full"
+			x-model="title"
+			:class="{'text-transparent': method != 'POST'}"
+			:disabled="method != 'POST'"
+			x-data="{ rows: 1 }"
+			:rows="rows"
+			@input="
+				rows = title.split('\n').length
+				if (rows > 1) {
+					title = title.replace(/^[^・]/gm, '・$&')
+				}
+			"
+		></textarea>
+	</td>
+	<td class="px-4 py-2">
+		<button 
+			class="px-4 py-2 text-sm font-semibold text-white rounded"
+			:class="method == 'POST' ? 'bg-fuchsia-300 hover:bg-fuchsia-400' : 'bg-gray-400 hover:bg-gray-500'"
+			@click.prevent="() => {
+				if (method == 'POST') {
+					submit()
+				} else {
+					method     = 'POST';
+					id         = null;
+					title      = '';
+					finishedAt = '';
+				}
+			}"
+		>
+			<i class="fas" :class="method == 'POST' ? 'fa-check' : 'fa-plus'"></i>
+			</button>
+		</td>
+	</tr>

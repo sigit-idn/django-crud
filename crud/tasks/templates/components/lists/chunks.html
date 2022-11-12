@@ -1,0 +1,53 @@
+<form 
+	x-data="{ 
+		method     : 'POST', // POST | PUT | DELETE
+		id         : null,
+		title      : '',
+		finishedAt : '',
+
+		submit() {
+			const url = this.id 
+				? '{% url 'api:chunk' task_id=task.id id='__id__' %}'.replace('__id__', this.id)
+				: '{% url 'api:chunks' task_id=task.id %}';
+
+			const data = {
+				title      : this.title.replace(/^・/gm, ''),
+				finishedAt : this.finishedAt,
+			};
+
+			const options = {
+				method: this.method,
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': '{{ csrf_token }}',
+					'credentials': 'include'
+				},
+				body: JSON.stringify(data)
+			};
+
+			fetch(url, options)
+				.then(() => window.location.reload())
+				.catch(err => console.error(err));
+		}
+	}"
+	@submit.prevent="submit()"
+>
+	<table class="w-full text-left rounded-lg overflow-hidden px-4 py-2 bg-white">
+		<thead>
+			<tr class="text-gray-800 border-b">
+				<th class="px-4 py-2">No</th>
+				<th class="px-4 py-2">Title</th>
+				<th class="px-4 py-2">Finished at</th>
+				<th class="px-4 py-2">Time spent</th>
+				<th class="px-4 py-2">Actions</th>
+			</tr>
+		</thead>
+		<tbody class="text-gray-700">
+			{% for chunk in chunks %}
+				{% include "components/list-items/chunk.html" %}
+			{% endfor %}
+
+			{% include "components/forms/add-chunk.html" %}
+			</tbody>
+		</table>
+	</form>

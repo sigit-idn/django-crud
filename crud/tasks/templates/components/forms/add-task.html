@@ -1,0 +1,55 @@
+<td class="px-4 py-2 text-center">
+	<i class="fas fa-plus"></i>
+</td>
+<td class="px-4 py-2">
+	<input
+		type="text"
+		name="title"
+		placeholder="Title"
+		class="p-2 border rounded disabled:opacity-50"
+		x-model="title"
+		:class="{'text-transparent': method != 'POST'}"
+		:disabled="method != 'POST'"
+	/>
+</td>
+<td class="px-4 py-2">
+	<input
+		type="text"
+		name="description"
+		placeholder="Description"
+		class="p-2 border rounded disabled:opacity-50"
+		x-model="description"
+		:class="{'text-transparent': method != 'POST'}"
+		:disabled="method != 'POST'"
+	/>
+</td>
+<td class="px-4 py-2">
+	<input
+		type="datetime-local"
+		name="due_date"
+		placeholder="Due Date" 
+		class="p-2 border rounded disabled:opacity-50"
+		x-model="due_date"
+		:class="{'text-transparent': method != 'POST'}"
+		:disabled="method != 'POST'"
+	/>
+</td>
+<td class="px-4 py-2">
+	<button 
+		class="px-4 py-2 text-sm font-semibold text-white rounded"
+		:class="method == 'POST' ? 'bg-fuchsia-300 hover:bg-fuchsia-400' : 'bg-gray-400 hover:bg-gray-500'"
+		@click.prevent="() => {
+			if (method == 'POST') {
+				submit()
+			} else {
+				method = 'POST'
+				id = null
+				title = ''
+				description = ''
+				due_date = ''
+			}
+		}"
+	>
+		<i class="fas" :class="method == 'POST' ? 'fa-check' : 'fa-plus'"></i>
+	</button>
+</td>

@@ -1,21 +1,17 @@
-import json
-
-from django.shortcuts               import render
-from django.http                    import HttpResponse
-from django.contrib.auth.models     import User
 from django.views                   import generic
 from tasks.models                   import Task
-from django.urls                    import reverse_lazy
-from django.contrib.auth            import authenticate, login, logout
 
 
+# pylint: disable=no-member
 class IndexView(generic.ListView):
-	template_name = 'index.html'
+	"""IndexView is a generic class base view for the index page."""
+	template_name = 'tasks/index.html'
 	context_object_name = 'tasks'
 
 	def get_queryset(self):
 		return Task.objects.filter(user=self.request.user)
 
 class DetailView(generic.DetailView):
+	"""DetailView is a generic class base view for the detail page."""
 	model = Task
-	template_name = 'detail.html'
+	template_name = 'tasks/detail.html'

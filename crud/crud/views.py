@@ -1,17 +1,17 @@
-import json
-
 from django.shortcuts           import render, redirect
 from django.http                import HttpResponse
 from django.contrib.auth.models import User
 from django.views               import generic
-from django.urls                import reverse_lazy
 from django.contrib.auth        import authenticate, login, logout
 
 class RegisterView(generic.View):
+	"""RegisterView is a generic class base view for the register endpoint."""
 	def get(self, request):
-		return render(request, 'register.html')
+		"""Show the register form."""
+		return render(request, 'auth/register.html')
 
 	def post(self, request):
+		"""Perform the registration."""
 		username  = request.POST['username']
 		email     = request.POST['email']
 		name      = request.POST['name']
@@ -35,10 +35,13 @@ class RegisterView(generic.View):
 		return redirect('tasks:index')
 
 class LoginView(generic.View):
+	"""LoginView is a generic class base view for the login endpoint."""
 	def get(self, request):
-		return render(request, 'login.html')
+		"""Show the login form."""
+		return render(request, 'auth/login.html')
 
 	def post(self, request):
+		"""Perform the login."""
 		username = request.POST['username']
 		password = request.POST['password']
 		user = authenticate(request, username=username, password=password)
@@ -47,9 +50,11 @@ class LoginView(generic.View):
 			login(request, user)
 			return redirect('tasks:index')
 		else:
-			return render(request, 'login.html')
+			return render(request, 'auth/login.html', {'error': 'Invalid credentials'})
 
 class LogoutView(generic.View):
+	"""LogoutView is a generic class base view for the logout endpoint."""
 	def get(self, request):
+		"""Perform the logout."""
 		logout(request)
 		return redirect('login')

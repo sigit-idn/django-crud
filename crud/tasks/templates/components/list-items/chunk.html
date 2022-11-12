@@ -1,0 +1,78 @@
+<tr data-id="{{ chunk.id }}" class="hover:bg-blue-50">
+	<td class="px-4 py-2 text-center">{{ forloop.counter }}</td>
+	<td class="px-4 py-2">
+		<span x-show="id != {{ chunk.id }}">{{ chunk.title }}</span>
+		<input
+			type="text" 
+			x-model="title" 
+			x-show="id == {{ chunk.id }}" 
+			class="px-4 py-2 border rounded"
+			style="display: none;"
+		/>
+	</td>
+	<td class="px-4 py-2">
+		{% if chunk.finished_at %}
+			<span x-show="id != {{ chunk.id }}">{{ chunk.finished_at|date:'Y-m-d H:i' }}</span>
+			<input
+				type="datetime-local"
+				x-model="finishedAt"
+				x-show="id == {{ chunk.id }}" 
+				class="px-4 py-2 border rounded"
+				style="display: none;"
+			/>
+		{% else %}
+			<button 
+				type="button" 
+				class="px-4 py-2 bg-indigo-300 hover:bg-indigo-400 text-white rounded disabled:opacity-50"
+				x-show="id != {{ chunk.id }}"
+				:disabled="{{ task.started_at|yesno:'false,true' }}"
+				@click="
+					method = 'PUT';
+					id = {{ chunk.id }};
+					title = '{{ chunk.title }}';
+					finishedAt = new Date().toLocaleString().replace(/\//g,'-').replace(/ /g, 'T');
+					submit();
+				"
+			>
+				Finish
+			</button>
+		{% endif %}
+	</td>
+	<td class="px-4 py-2">
+		<span>{{ chunk.duration|default:'-' }}</span>
+	</td>
+	<td class="px-4 py-2">
+		<button
+			type="button"
+			class="px-4 py-2 text-sm font-semibold text-white rounded"
+			:class="id == {{ chunk.id }} ? 'bg-fuchsia-300 hover:bg-fuchsia-400' : 'bg-gray-400 hover:bg-gray-500'"
+			@click.prevent="
+				id != {{ chunk.id }} 
+					? (
+							method      = 'PUT',
+							id          = {{ chunk.id }},
+							title       = '{{ chunk.title }}',
+							finishedAt  = '{{ chunk.finished_at|date:'Y-m-d H:i' }}'
+						)
+					: submit()
+			"
+		>
+			<i class="fas" :class="id == {{ chunk.id }} ? 'fa-check' : 'fa-edit'"></i>
+		</button>
+		
+		<button
+			type="button"
+			class="px-4 py-2 text-sm font-semibold text-white bg-gray-400 rounded hover:bg-gray-500"
+			@click.prevent="() => {
+				if (confirm('Are you sure you want to delete chunk {{ chunk.title|truncatechars:10 }}?')) {
+					method = 'DELETE';
+					id     = {{ chunk.id }};
+					submit();
+				}
+			}"
+		>
+			<i class="fas fa-trash"></i>
+		</button>
+
+	</td>
+</tr>

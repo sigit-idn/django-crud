@@ -1,7 +1,11 @@
+"""Task model"""
+
 from django.db                  import models
 from django.contrib.auth.models import User
 
+# pylint: disable=no-member
 class Task(models.Model):
+	"""Task is a model for the tasks table."""
 	title       = models.CharField(max_length=200)
 	description = models.TextField(blank=True, null=True)
 	due_date    = models.DateTimeField()
@@ -10,6 +14,7 @@ class Task(models.Model):
 
 	@property
 	def progress(self):
+		"""progress is a property that returns the progress of the task."""
 		total_chunks = self.chunks.count()
 		if total_chunks == 0:
 			return 0
@@ -19,6 +24,7 @@ class Task(models.Model):
 
 	@property
 	def estimated_seconds_left(self):
+		"""estimated_seconds_left is a property that returns the estimated seconds left of the task."""
 		if self.progress % 100 == 0:
 			return 0
 
@@ -28,6 +34,7 @@ class Task(models.Model):
 
 	@property
 	def average_duration(self):
+		"""average_duration is a property that returns the average duration of the task."""
 		total_finished_chunks = self.chunks.filter(finished_at__isnull=False).count()
 		if total_finished_chunks == 0:
 			return 0
@@ -42,12 +49,14 @@ class Task(models.Model):
 
 	@property
 	def finished_at(self):
+		"""finished_at is a property that returns the finished at of the task."""
 		return self.chunks.order_by('-finished_at').first().finished_at
 
 	def __str__(self):
-		return self.title
+		return str(self.title)
 
 	def to_json(self):
+		"""to_json is a method that returns a json representation of the task."""
 		return {
 			'id'         : self.id,
 			'title'      : self.title,
