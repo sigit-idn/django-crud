@@ -1,3 +1,5 @@
+import typing
+
 from django.views                   import generic
 from tasks.models                   import Task
 
@@ -8,7 +10,7 @@ class IndexView(generic.ListView):
 	template_name = 'tasks/index.html'
 	context_object_name = 'tasks'
 
-	def get_queryset(self):
+	def get_queryset(self) -> list[Task]:
 		return Task.objects.filter(user=self.request.user)
 
 class DetailView(generic.DetailView):

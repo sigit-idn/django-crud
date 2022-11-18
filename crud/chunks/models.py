@@ -1,6 +1,8 @@
 import datetime
-from django.db                  import models
-from tasks.models               import Task
+import typing
+
+from django.db    import models
+from tasks.models import Task
 
 
 # pylint: disable=no-member
@@ -11,13 +13,13 @@ class Chunk(models.Model):
 	finished_at = models.DateTimeField(blank=True, null=True)
 
 	@property
-	def duration(self):
+	def duration(self: object) -> datetime.timedelta:
 		"""duration is a property that returns the duration of the chunk."""
 		if self.finished_at is None:
 			return
 
-		chunk_before = self.task.chunks.filter(finished_at__lt=self.finished_at).order_by('-finished_at').first()
-		started_at = chunk_before.finished_at if chunk_before is not None else self.task.started_at
+		chunk_before: Chunk = self.task.chunks.filter(finished_at__lt=self.finished_at).order_by('-finished_at').first()
+		started_at: datetime = chunk_before.finished_at if chunk_before is not None else self.task.started_at
 
 		days = (self.finished_at.date() - started_at.date()).days
 
@@ -30,10 +32,10 @@ class Chunk(models.Model):
 		return self.finished_at - started_at
 
 
-	def __str__(self):
+	def __str__(self) -> str:
 		return str(self.title)
 
-	def to_json(self):
+	def to_json(self) -> dict:
 		"""to_json is a method that returns a json representation of the chunk."""
 		return {
 			'id'         : self.id,

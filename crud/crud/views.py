@@ -1,16 +1,18 @@
-from django.shortcuts           import render, redirect
-from django.http                import HttpResponse
-from django.contrib.auth.models import User
-from django.views               import generic
+from typing                     import Any, List, Optional
 from django.contrib.auth        import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.http                import HttpResponse, HttpRequest
+from django.shortcuts           import redirect, render
+from django.views               import generic
+
 
 class RegisterView(generic.View):
 	"""RegisterView is a generic class base view for the register endpoint."""
-	def get(self, request):
+	def get(self: object, request: HttpRequest) -> HttpResponse:
 		"""Show the register form."""
 		return render(request, 'auth/register.html')
 
-	def post(self, request):
+	def post(self: object, request: HttpRequest) -> HttpResponse:
 		"""Perform the registration."""
 		username  = request.POST['username']
 		email     = request.POST['email']
@@ -36,15 +38,15 @@ class RegisterView(generic.View):
 
 class LoginView(generic.View):
 	"""LoginView is a generic class base view for the login endpoint."""
-	def get(self, request):
+	def get(self: object, request: HttpRequest) -> HttpResponse:
 		"""Show the login form."""
 		return render(request, 'auth/login.html')
 
-	def post(self, request):
+	def post(self: object, request: HttpRequest) -> HttpResponse:
 		"""Perform the login."""
 		username = request.POST['username']
 		password = request.POST['password']
-		user = authenticate(request, username=username, password=password)
+		user: Optional[User] = authenticate(request, username=username, password=password)
 
 		if user is not None:
 			login(request, user)
@@ -54,7 +56,7 @@ class LoginView(generic.View):
 
 class LogoutView(generic.View):
 	"""LogoutView is a generic class base view for the logout endpoint."""
-	def get(self, request):
+	def get(self: object, request: HttpRequest) -> HttpResponse:
 		"""Perform the logout."""
 		logout(request)
 		return redirect('login')
