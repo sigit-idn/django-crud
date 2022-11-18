@@ -1,8 +1,8 @@
 """Task model"""
 
 import typing
-import datetime
 
+from datetime                   import datetime
 from django.db                  import models
 from django.contrib.auth.models import User
 
@@ -51,7 +51,7 @@ class Task(models.Model):
 		return total_duration / total_finished_chunks / 3600 # in hours
 
 	@property
-	def finished_at(self: object) -> datetime.datetime:
+	def finished_at(self: object) -> datetime:
 		"""finished_at is a property that returns the finished at of the task."""
 		return self.chunks.order_by('-finished_at').first().finished_at
 
